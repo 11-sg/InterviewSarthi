@@ -36,13 +36,24 @@ async function registerUserController(req, res) {
         password: hash
     })
 
+    if (!process.env.JWT_SECRET) {
+        return res.status(500).json({
+            message: "JWT_SECRET is not configured on the server"
+        })
+    }
+
     const token = jwt.sign(
         { id: user._id, username: user.username },
         process.env.JWT_SECRET,
         { expiresIn: "1d" }
     )
 
-    res.cookie("token", token)
+    res.cookie("token", token, {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true
+    })
+
 
 
     res.status(201).json({
@@ -119,13 +130,24 @@ async function loginUserController(req, res) {
             });
         }
 
+        if (!process.env.JWT_SECRET) {
+            return res.status(500).json({
+                message: "JWT_SECRET is not configured on the server"
+            });
+        }
+
         const token = jwt.sign(
             { id: user._id, username: user.username },
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
 
-        res.cookie("token", token);
+        res.cookie("token", token, {
+            httpOnly: true,
+            sameSite: "none",
+            secure: true
+        });
+
 
         return res.status(200).json({
             message: "User logged in successfully",
@@ -155,7 +177,11 @@ async function logoutUserController(req, res) {
         await tokenBlacklistModel.create({ token })
     }
 
-    res.clearCookie("token")
+    res.clearCookie("token", {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true
+    })
 
     res.status(200).json({
         message: "User logged out successfully"

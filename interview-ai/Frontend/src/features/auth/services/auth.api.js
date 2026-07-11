@@ -1,10 +1,17 @@
 import axios from "axios"
 
 
+// const api = axios.create({
+//     baseURL: "https://interviewsarthi.onrender.com",
+//     withCredentials: true
+// })
+
 const api = axios.create({
     baseURL: "https://interviewsarthi.onrender.com",
     withCredentials: true
-})
+});
+
+export default api;
 
 export async function register({ username, email, password }) {
 

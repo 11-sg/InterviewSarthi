@@ -212,9 +212,37 @@ async function getMeController(req, res) {
 
 
 
+async function debugCookieController(req, res) {
+    const token = req.cookies?.token;
+
+    if (!token) {
+        return res.status(200).json({
+            hasToken: false,
+            message: "No token cookie received"
+        });
+    }
+
+    const payload = (() => {
+        try {
+            // Do not trust the result; just show whether verification would succeed
+            jwt.verify(token, process.env.JWT_SECRET);
+            return { verify: "ok" };
+        } catch (e) {
+            return { verify: "failed", error: e?.message };
+        }
+    })();
+
+    res.status(200).json({
+        hasToken: true,
+        cookieOptionsExpected: { httpOnly: true, secure: true, sameSite: "none" },
+        verification: payload
+    });
+}
+
 module.exports = {
     registerUserController,
     loginUserController,
     logoutUserController,
-    getMeController
+    getMeController,
+    debugCookieController
 }

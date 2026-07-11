@@ -35,5 +35,12 @@ authRouter.get("/logout", authController.logoutUserController)
  */
 authRouter.get("/get-me", authMiddleware.authUser, authController.getMeController)
 
+/**
+ * @route GET /api/auth/debug-cookie
+ * @description Debug whether cookie token is present/parsable on the backend
+ * @access public (dev)
+ */
+authRouter.get("/debug-cookie", authController.debugCookieController)
+
 
 module.exports = authRouter
